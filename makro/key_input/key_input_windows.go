@@ -39,7 +39,7 @@ func (s *InternalKeyInputService) findKeys(text string) (KeysListType, error) {
 	var keys KeysListType
 
 	for _, char := range text {
-		key, err := keysList.FindKeyByDisplayName(string(char))
+		key, err := WindowsKeysList.FindKeyByDisplayName(string(char))
 
 		if err != nil {
 			s.log.WithField("key", char).WithError(err).Error("cannot translate key to code")
@@ -85,7 +85,7 @@ func (s *InternalKeyInputService) press(keycode uint16) {
 }
 
 func (s *InternalKeyInputService) Submit() error {
-	key, err := keysList.FindKeyByDisplayName("ENTER")
+	key, err := WindowsKeysList.FindKeyByDisplayName("ENTER")
 	if err != nil {
 		s.log.WithError(err).Error("cannot find ENTER keycode")
 		return err
@@ -114,7 +114,7 @@ func (s *InternalKeyInputService) Type(text string) error {
 }
 
 var shift uint16 = 0x10
-var keysList = KeysListType{
+var WindowsKeysList = KeysListType{
 	{DisplayName: " ", VirtualCode: 0x20},
 	{DisplayName: "0", VirtualCode: 0x30},
 	{DisplayName: "1", VirtualCode: 0x31},
