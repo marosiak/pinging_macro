@@ -12,15 +12,17 @@ import (
 
 type InternalPharaseListenerService struct {
 	keyboard *keyboard.Driver
+	keysList key_input.KeysListType
 	log *log.Entry
 }
 type PharaseListenerService interface {
 	Listen(func(name string) error) error
 }
 
-func NewPharaseListenerService(keyboardDriver *keyboard.Driver, logger *log.Entry) PharaseListenerService {
+func NewPharaseListenerService(keyboardDriver *keyboard.Driver, keysList key_input.KeysListType, logger *log.Entry) PharaseListenerService {
 	return &InternalPharaseListenerService {
 		keyboard: keyboardDriver,
+		keysList: keysList,
 		log: logger,
 	}
 }
@@ -36,7 +38,7 @@ func (s *InternalPharaseListenerService) Listen(pingFunc func(name string) error
 	// TODO: Worker który sprawdzi, kiedy był kliknięty ostatnio przycisk, i jeżeli ten czas jest dłuższy niż X wtedy usuwamy fraze
 	for {
 		// TODO: Jakiś sposób na cross platform, można np zrobić w interfejsie key_input'a funkcje zwracającą liste przycisków dla danej platformy
-		for _, key := range key_input.WindowsKeysList {
+		for _, key := range s.keysList {
 			if win.GetKeyState(int32(key.VirtualCode))>>15 != 0 {
 				var lastChar charStruct
 
