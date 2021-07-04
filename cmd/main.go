@@ -4,12 +4,10 @@ import (
 	"github.com/orzel1244/pinging_macro/makro"
 	"github.com/orzel1244/pinging_macro/makro/key_input"
 	log "github.com/sirupsen/logrus"
-	"time"
+	"gobot.io/x/gobot/platforms/keyboard"
 )
 
 func main() {
-	time.Sleep(1 * time.Second)
-
 	mainLogger := log.New()
 	mainLogger.SetLevel(log.DebugLevel)
 	logger := log.NewEntry(mainLogger)
@@ -17,8 +15,15 @@ func main() {
 	typingSrv := key_input.NewKeyInputService(logger)
 	pingingSrv := makro.NewPingerService(typingSrv, logger)
 
-	err := pingingSrv.Ping("sasin nie wiedzial o wYbOrAcH ktore sIe NiE oDbYly")
-	if err != nil {
-		logger.WithError(err).Error("cannot ping")
+	keyboardDriver := keyboard.NewDriver()
+	pharaseSrv := makro.NewPharaseListenerService(
+		keyboardDriver,
+		typingSrv.GetKeysList(),
+		pingingSrv,
+		logger,
+		)
+
+	if err := pharaseSrv.Listen(); err != nil {
+		log.Fatal(err)
 	}
 }

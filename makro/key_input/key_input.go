@@ -32,6 +32,7 @@ func (k KeysListType) FindKeyByDisplayName(displayName string) (KeyStruct, error
 type KeyInputService interface {
 	Type(text string) error
 	Submit() error
+	GetKeysList() KeysListType
 }
 
 func NewKeyInputService(logger *log.Entry) KeyInputService {
