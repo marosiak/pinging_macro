@@ -3,6 +3,7 @@ package key_input
 import (
 	log "github.com/sirupsen/logrus"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -106,16 +107,26 @@ func (s *InternalKeyInputService) Type(text string) error {
 	}
 
 	for _, key := range keys {
-		if key.IsUpperCase || key.IsSpecial {
+		useShift := key.IsUpperCase || key.IsSpecial
+
+		if useShift {
 			s.press(shift)
 		}
+
+		time.Sleep(time.Millisecond*20)
 		s.press(key.VirtualCode)
+
+		time.Sleep(time.Millisecond*20)
 		s.release(key.VirtualCode)
-		s.release(shift)
+
+		if useShift {
+			s.release(shift)
+		}
 	}
 
 	return nil
 }
+
 
 var shift uint16 = 0x10
 var keysList = KeysListType{
@@ -159,7 +170,6 @@ var keysList = KeysListType{
 	{DisplayName: "N", VirtualCode: 0x4E},
 	{DisplayName: "M", VirtualCode: 0x4D},
 
-	{DisplayName: "ENTER", VirtualCode: 0x0D},
 	{DisplayName: "\n", VirtualCode: 0x0D},
 
 	{DisplayName: "!", VirtualCode: 0x31, IsSpecial: true},

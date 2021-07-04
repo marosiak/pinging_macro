@@ -13,7 +13,7 @@ type InternalPingerService struct {
 	log *log.Entry
 }
 type PingerService interface {
-	Ping(name string) error
+	Ping(names ...string) error
 }
 
 func NewPingerService(typingSrv key_input.KeyInputService, logger *log.Entry) PingerService {
@@ -23,7 +23,7 @@ func NewPingerService(typingSrv key_input.KeyInputService, logger *log.Entry) Pi
     }
 }
 
-func (s *InternalPingerService) Ping(name string) error {
+func (s *InternalPingerService) ping(name string, submit bool) error {
 	err := s.typingSrv.Type(" ")
 	if err != nil {
 		return err
@@ -37,11 +37,35 @@ func (s *InternalPingerService) Ping(name string) error {
 	if err != nil {
 		return err
 	}
-	time.Sleep(time.Millisecond * 350)
+	time.Sleep(time.Millisecond * 650)
+
+	if !submit {
+		return nil
+	}
 
 	err = s.typingSrv.Submit()
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (s *InternalPingerService) Ping(names ...string) error {
+	fmt.Printf("Received order for: %s\n", names)
+	for i, name := range names {
+		submit := true
+
+		if i == len(names)-1{
+			// IF it is last ping, we don't want to press enter,
+			// because for instance in messenger any many other communicators, it would send that whole message
+			// it is better to have control over decision if you want to send message, or write something else.
+			submit = false
+		}
+
+		err := s.ping(name, submit)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

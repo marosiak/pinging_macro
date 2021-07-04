@@ -16,9 +16,14 @@ func main() {
 	pingingSrv := makro.NewPingerService(typingSrv, logger)
 
 	keyboardDriver := keyboard.NewDriver()
-	pharaseSrv := makro.NewPharaseListenerService(keyboardDriver, typingSrv.GetKeysList(), logger)
+	pharaseSrv := makro.NewPharaseListenerService(
+		keyboardDriver,
+		typingSrv.GetKeysList(),
+		pingingSrv,
+		logger,
+		)
 
-	if err := pharaseSrv.Listen(pingingSrv.Ping); err != nil {
+	if err := pharaseSrv.Listen(); err != nil {
 		log.Fatal(err)
 	}
 }
